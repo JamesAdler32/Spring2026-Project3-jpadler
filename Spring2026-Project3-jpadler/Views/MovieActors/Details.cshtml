@@ -4,9 +4,9 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1 class="boxed">Details</h1>
 
-<div>
+<div class="boxed">
     <h4>MovieActor</h4>
     <hr />
     <dl class="row">
@@ -14,13 +14,13 @@
             @Html.DisplayNameFor(model => model.Actor)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Actor.Id)
+            @Html.DisplayFor(model => model.Actor!.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Movie)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Id)
+            @Html.DisplayFor(model => model.Movie!.Title)
         </dd>
     </dl>
 </div>

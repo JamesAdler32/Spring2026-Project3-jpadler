@@ -112,7 +112,7 @@ namespace Spring2026_Project3_jpadler.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Gender,Age,IMDBLink,Photo")] Actor actor)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Gender,Age,IMDBLink")] Actor actor, IFormFile? Photo)
         {
             if (id != actor.Id)
             {
@@ -123,6 +123,12 @@ namespace Spring2026_Project3_jpadler.Controllers
             {
                 try
                 {
+                    if (Photo != null && Photo.Length > 0)
+                    {
+                        using var stream = new MemoryStream();
+                        await Photo.CopyToAsync(stream);
+                        actor.Photo = stream.ToArray();
+                    }
                     _context.Update(actor);
                     await _context.SaveChangesAsync();
                 }
