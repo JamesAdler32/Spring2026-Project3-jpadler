@@ -14,6 +14,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+//Spring2026_Project3_jpadler.Controllers.AzureSecretProvider.Initialize(builder.Configuration);
+Spring2026_Project3_jpadler.Controllers.ReviewGenerator.Init(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

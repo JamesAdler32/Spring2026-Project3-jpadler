@@ -40,7 +40,27 @@ namespace Spring2026_Project3_jpadler.Controllers
                 return NotFound();
             }
 
-            return View(actor);
+            var movieList = await _context.MovieActor
+                .Where(m => m.ActorId == id)
+                .Select(ma => ma.Movie)
+                .ToListAsync();
+
+            if (movieList == null)
+            {
+                movieList = new List<Movie?>();
+            }
+
+            var rg = new ReviewGenerator(actor.Name, actor.Age);
+            var review = await rg.TwitterReviews();
+
+            var vm = new ActorMoviesViewModel
+            {
+                Actor = actor,
+                ActorMovies = movieList,
+                Reviews = review,
+            };
+
+            return View(vm);
         }
 
         // GET: Actors/Create
@@ -54,10 +74,16 @@ namespace Spring2026_Project3_jpadler.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Gender,Age,IMDBLink,Photo")] Actor actor)
+        public async Task<IActionResult> Create([Bind("Id,Name,Gender,Age,IMDBLink")] Actor actor, IFormFile? Photo)
         {
             if (ModelState.IsValid)
             {
+                if (Photo != null && Photo.Length > 0)
+                {
+                    using var stream = new MemoryStream();
+                    await Photo.CopyToAsync(stream);
+                    actor.Photo = stream.ToArray();
+                }
                 _context.Add(actor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

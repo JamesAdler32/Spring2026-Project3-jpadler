@@ -35,12 +35,39 @@ namespace Spring2026_Project3_jpadler.Controllers
 
             var movie = await _context.Movie
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (movie == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            var actorList = await _context.MovieActor
+                .Where(m => m.MovieId == id)
+                .Select(ma => ma.Actor)
+                .ToListAsync();
+
+            if (actorList == null)
+            {
+                actorList = new List<Actor?>();
+            }
+
+            var rg = new ReviewGenerator(movie.Title, movie.ReleaseYear);
+            var review = await rg.MovieReviews();
+
+            var vm = new MovieActorsViewModel
+            {
+                Movie = movie,
+                MovieActors = actorList,
+                Reviews = review,
+            };
+
+            Console.WriteLine(vm.Reviews.Reviews.Count());
+            foreach (var item in vm.Reviews!.Reviews)
+            {
+                Console.WriteLine("Item: " + item?.ReviewStr);
+            }
+
+            return View(vm);
         }
 
         // GET: Movies/Create
@@ -54,10 +81,16 @@ namespace Spring2026_Project3_jpadler.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,IMDBLink,Genre,ReleaseYear,Poster")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Id,Title,IMDBLink,Genre,ReleaseYear")] Movie movie, IFormFile? Poster)
         {
             if (ModelState.IsValid)
             {
+                if (Poster != null && Poster.Length > 0)
+                {
+                    using var stream = new MemoryStream();
+                    await Poster.CopyToAsync(stream);
+                    movie.Poster = stream.ToArray();
+                }
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,7 +119,7 @@ namespace Spring2026_Project3_jpadler.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,IMDBLink,Genre,ReleaseYear,Poster")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,IMDBLink,Genre,ReleaseYear")] Movie movie, IFormFile? Poster)
         {
             if (id != movie.Id)
             {
@@ -97,6 +130,12 @@ namespace Spring2026_Project3_jpadler.Controllers
             {
                 try
                 {
+                    if (Poster != null && Poster.Length > 0)
+                    {
+                        using var stream = new MemoryStream();
+                        await Poster.CopyToAsync(stream);
+                        movie.Poster = stream.ToArray();
+                    }
                     _context.Update(movie);
                     await _context.SaveChangesAsync();
                 }
