@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Spring2026_Project3_jpadler.styles.css" asp-append-version="true" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css" integrity="sha384-iRTWPXZquQySBE9K96fgJXUIrnm8TpdtPAbiCNR+qjpP24qFZw9PHFA91JtWy7Ul" crossorigin="anonymous">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.min.js" integrity="sha384-Lo2E+ASlyar6zUXt6sPEy5uaDGtDGHXo300rohaW4/AV26JdoLBT9zhcOhV8BtL8" crossorigin="anonymous"></script>
+
 </head>
 <body>
     <header>
@@ -52,9 +62,20 @@
             &copy; 2026 - Spring2026_Project3_jpadler - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("table").DataTable({
+                paging: true,
+                searching: true,
+                ordering: true
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
