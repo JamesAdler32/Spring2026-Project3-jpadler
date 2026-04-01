@@ -54,7 +54,7 @@ namespace Spring2026_Project3_jpadler.Controllers
 
         private async Task<ReviewBundle> MovieReviewsSingleCallParsed()
         {
-            Console.WriteLine("Asking reviewers...");
+            //Console.WriteLine("Asking reviewers...");
             ChatClient client = new AzureOpenAIClient(ApiEndpoint, ApiCredential).GetChatClient(AiDeployment);
 
             string[] personas = { "is harsh", "loves romance", "loves comedy", "loves thrillers", "loves fantasy" };
@@ -76,15 +76,15 @@ namespace Spring2026_Project3_jpadler.Controllers
                 SentimentAnalysisResults sentiment = analyzer.PolarityScores(review);
                 sentimentTotal += sentiment.Compound;
 
-                Console.WriteLine($"Review {i + 1} (sentiment {sentiment.Compound})");
-                Console.WriteLine(review);
-                Console.WriteLine();
+                //Console.WriteLine($"Review {i + 1} (sentiment {sentiment.Compound})");
+                //Console.WriteLine(review);
+                //Console.WriteLine();
 
                 ReviewsSentiments.Add(new Review { ReviewStr = review, Sentiment = sentiment.Compound });
             }
 
             double sentimentAverage = sentimentTotal / reviews.Length;
-            Console.Write($"#####\n# Sentiment Average: {sentimentAverage:#.###}\n#####\n");
+            //Console.Write($"#####\n# Sentiment Average: {sentimentAverage:#.###}\n#####\n");
 
             var rb = new ReviewBundle {
                 Reviews = ReviewsSentiments,
@@ -96,7 +96,7 @@ namespace Spring2026_Project3_jpadler.Controllers
 
         private async Task<ReviewBundle> TwitterApiSim()
         {
-            Console.WriteLine("Polling Twitter...");
+            //Console.WriteLine("Polling Twitter...");
 
             ChatClient client = new AzureOpenAIClient(ApiEndpoint, ApiCredential).GetChatClient(AiDeployment);
 
@@ -108,7 +108,7 @@ namespace Spring2026_Project3_jpadler.Controllers
             ClientResult<ChatCompletion> result = await client.CompleteChatAsync(messages);
 
             string tweetsJsonString = result.Value.Content.FirstOrDefault()?.Text ?? "[]";
-            Console.WriteLine(tweetsJsonString);
+            //Console.WriteLine(tweetsJsonString);
             JsonArray json = JsonNode.Parse(tweetsJsonString)!.AsArray();
 
             var analyzer = new SentimentIntensityAnalyzer();
@@ -121,14 +121,14 @@ namespace Spring2026_Project3_jpadler.Controllers
                 SentimentAnalysisResults sentiment = analyzer.PolarityScores(tweet.Text);
                 sentimentTotal += sentiment.Compound;
 
-                Console.WriteLine($"{tweet.Username}: \"{tweet.Text}\" (sentiment {sentiment.Compound})\n");
+                //Console.WriteLine($"{tweet.Username}: \"{tweet.Text}\" (sentiment {sentiment.Compound})\n");
 
                 string review = tweet.Username + ":\n" + tweet.Text;
                 ReviewsSentiments.Add(new Review { ReviewStr = review, Sentiment = sentiment.Compound });
             }
 
             double sentimentAverage = sentimentTotal / tweets.Length;
-            Console.Write($"#####\n# Sentiment Average: {sentimentAverage:#.###}\n#####\n");
+            //Console.Write($"#####\n# Sentiment Average: {sentimentAverage:#.###}\n#####\n");
 
             var rb = new ReviewBundle
             {

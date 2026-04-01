@@ -49,8 +49,8 @@ namespace Spring2026_Project3_jpadler.Controllers
         // GET: MovieActors/Create
         public IActionResult Create()
         {
-            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Id");
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id");
+            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Name");
+            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Title");
             return View();
         }
 
@@ -61,14 +61,23 @@ namespace Spring2026_Project3_jpadler.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ActorId,MovieId")] MovieActor movieActor)
         {
-            if (ModelState.IsValid)
+            bool exists = await _context.MovieActor
+                .AnyAsync(ma => ma.MovieId == movieActor.MovieId
+                             && ma.ActorId == movieActor.ActorId);
+
+            if (exists)
+            {
+                ModelState.AddModelError("", "This actor is already assigned to this movie.");
+            }
+
+            else if (ModelState.IsValid)
             {
                 _context.Add(movieActor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Id", movieActor.ActorId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", movieActor.MovieId);
+            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Name", movieActor.ActorId);
+            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Title", movieActor.MovieId);
             return View(movieActor);
         }
 
@@ -85,8 +94,8 @@ namespace Spring2026_Project3_jpadler.Controllers
             {
                 return NotFound();
             }
-            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Id", movieActor.ActorId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", movieActor.MovieId);
+            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Name", movieActor.ActorId);
+            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Title", movieActor.MovieId);
             return View(movieActor);
         }
 
@@ -106,8 +115,22 @@ namespace Spring2026_Project3_jpadler.Controllers
             {
                 try
                 {
-                    _context.Update(movieActor);
-                    await _context.SaveChangesAsync();
+                    // Doesnt quite work how I want (doesnt show the error) but still stops duplicates
+                    bool exists = await _context.MovieActor
+                            .AnyAsync(ma =>
+                                ma.MovieId == movieActor.MovieId &&
+                                ma.ActorId == movieActor.ActorId &&
+                                ma.Id != movieActor.Id);
+
+                    if (exists)
+                    {
+                        ModelState.AddModelError("", "This actor is already assigned to this movie.");
+                    }
+                    else
+                    {
+                        _context.Update(movieActor);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -122,8 +145,8 @@ namespace Spring2026_Project3_jpadler.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Id", movieActor.ActorId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", movieActor.MovieId);
+            ViewData["ActorId"] = new SelectList(_context.Actor, "Id", "Name", movieActor.ActorId);
+            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Title", movieActor.MovieId);
             return View(movieActor);
         }
 
